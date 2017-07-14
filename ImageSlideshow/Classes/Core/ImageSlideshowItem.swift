@@ -13,11 +13,19 @@ open class ImageSlideshowItem: UIScrollView, UIScrollViewDelegate {
     /// Image view to hold the image
     open let imageView = UIImageView()
 
+    /// Label that display the title
+    open let titleLabel = UILabel()
+
+    /// Label that display the description
+    open let descriptionLabel = UILabel()
+    
     /// Activity indicator shown during image loading, when nil there won't be shown any
     open let activityIndicator: ActivityIndicatorView?
 
     /// Input Source for the item
     open let image: InputSource
+    
+    fileprivate var gradient:CAGradientLayer?
 
     /// Guesture recognizer to detect double tap to zoom
     open var gestureRecognizer: UITapGestureRecognizer?
@@ -45,7 +53,7 @@ open class ImageSlideshowItem: UIScrollView, UIScrollViewDelegate {
         - parameter image: Input Source to load the image
         - parameter zoomEnabled: holds if it should be possible to zoom-in the image
     */
-    init(image: InputSource, zoomEnabled: Bool, activityIndicator: ActivityIndicatorView? = nil) {
+    init(image: InputSource, zoomEnabled: Bool, activityIndicator: ActivityIndicatorView? = nil,titleFont:UIFont?,descriptionFont:UIFont?,gradient:CAGradientLayer?) {
         self.zoomEnabled = zoomEnabled
         self.image = image
         self.activityIndicator = activityIndicator
@@ -55,6 +63,12 @@ open class ImageSlideshowItem: UIScrollView, UIScrollViewDelegate {
         imageView.clipsToBounds = true
         imageView.isUserInteractionEnabled = true
 
+        titleLabel.numberOfLines = 1
+        titleLabel.textColor = UIColor.white
+        titleLabel.textAlignment = .center
+        descriptionLabel.numberOfLines = 0
+        descriptionLabel.textColor = UIColor.white
+        descriptionLabel.textAlignment = .center
         setPictoCenter()
 
         // scroll view configuration
@@ -62,9 +76,22 @@ open class ImageSlideshowItem: UIScrollView, UIScrollViewDelegate {
         showsVerticalScrollIndicator = false
         showsHorizontalScrollIndicator = false
         addSubview(imageView)
+        addSubview(titleLabel)
+        addSubview(descriptionLabel)
         minimumZoomScale = 1.0
         maximumZoomScale = calculateMaximumScale()
 
+        setTitleAndDescription(titleFont: titleFont, descriptionFont: descriptionFont)
+        if let gradient = gradient {
+            self.gradient = CAGradientLayer()
+            self.gradient?.colors = gradient.colors
+            self.gradient?.startPoint = gradient.startPoint
+            self.gradient?.endPoint = gradient.endPoint
+        }
+        
+        
+        
+        
         if let activityIndicator = activityIndicator {
             addSubview(activityIndicator.view)
         }
@@ -102,6 +129,21 @@ open class ImageSlideshowItem: UIScrollView, UIScrollViewDelegate {
         }
 
         self.activityIndicator?.view.center = imageView.center
+        
+        if let gradientLayer = imageView.layer.sublayers?.first {
+      //   gradientLayer.frame = imageView.bounds
+        }
+        
+        var descriptionFrame = imageView.frame
+        descriptionFrame.size.height = 47
+        descriptionFrame.origin.y = frame.height - descriptionFrame.size.height
+        descriptionLabel.frame = descriptionFrame
+        
+        var titleFrame = imageView.frame
+        titleFrame.size.height = 32
+        titleFrame.origin.y = descriptionFrame.origin.y - titleFrame.size.height
+        titleLabel.frame = titleFrame
+
 
         // if self.frame was changed and zoomInInitially enabled, zoom in
         if lastFrame != frame && zoomInInitially {
@@ -114,6 +156,30 @@ open class ImageSlideshowItem: UIScrollView, UIScrollViewDelegate {
         maximumZoomScale = calculateMaximumScale()
     }
 
+    func setTitleAndDescription(titleFont:UIFont? = nil,descriptionFont:UIFont? = nil){
+        if let title = self.image.imageTitle  {
+            titleLabel.text = title
+            if let font = titleFont {
+                titleLabel.font = font
+            }else{
+                titleLabel.font = UIFont.boldSystemFont(ofSize: 20)
+            }
+        }else{
+            titleLabel.isHidden = true
+        }
+        
+        if let description = self.image.imageDescription {
+            descriptionLabel.text = description
+            if let font = descriptionFont {
+                descriptionLabel.font = font
+            }else{
+                descriptionLabel.font = UIFont.systemFont(ofSize: 14)
+            }
+        }else{
+            descriptionLabel.isHidden = true
+        }
+    }
+    
     /// Request to load Image Source to Image View
     func loadImage() {
         if self.imageView.image == nil {
@@ -124,6 +190,10 @@ open class ImageSlideshowItem: UIScrollView, UIScrollViewDelegate {
                 self.imageView.image = self.imageReleased ? nil : image
                 self.activityIndicator?.hide()
                 self.loadFailed = image == nil
+                if let gradient = self.gradient {
+                    gradient.frame = self.imageView.bounds
+                    self.imageView.layer.insertSublayer(self.gradient!,at:0)
+                }
             }
         }
     }

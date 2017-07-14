@@ -128,6 +128,15 @@ open class ImageSlideshow: UIView {
             self.reloadScrollView()
         }
     }
+    
+    /// Set title font
+    open var titleFont : UIFont?
+    
+    /// Set description font
+    open var descriptionFont : UIFont?
+
+    /// Set gradient overlay for images
+    open var gradient : CAGradientLayer?
 
     /// Image change interval, zero stops the auto-scrolling
     open var slideshowInterval = 0.0 {
@@ -245,7 +254,7 @@ open class ImageSlideshow: UIView {
 
         var i = 0
         for image in scrollViewImages {
-            let item = ImageSlideshowItem(image: image, zoomEnabled: self.zoomEnabled, activityIndicator: self.activityIndicator?.create())
+            let item = ImageSlideshowItem(image: image, zoomEnabled: self.zoomEnabled, activityIndicator: self.activityIndicator?.create(),titleFont:titleFont,descriptionFont:descriptionFont,gradient:gradient)
             item.imageView.contentMode = self.contentScaleMode
             slideshowItems.append(item)
             scrollView.addSubview(item)

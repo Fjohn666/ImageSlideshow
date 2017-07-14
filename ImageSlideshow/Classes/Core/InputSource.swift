@@ -10,6 +10,9 @@ import UIKit
 
 /// A protocol that can be adapted by different Input Source providers
 @objc public protocol InputSource {
+    
+    var imageTitle:String? {get set}
+    var imageDescription:String? {get set}
     /**
      Load image from the source to image view.
      - parameter imageView: The image view to load the image into.
@@ -23,10 +26,18 @@ import UIKit
 open class ImageSource: NSObject, InputSource {
     var image: UIImage!
 
+    /// title that will be displayed at bottom of the slider and above the description if exists
+    public var imageTitle:String?
+    
+    /// description that will be displayed at bottom of the slider and below title if exists
+    public var imageDescription: String?
+    
     /// Initializes a new Image Source with UIImage
     /// - parameter image: Image to be loaded
-    public init(image: UIImage) {
+    public init(image: UIImage,title:String? = nil,description:String? = nil) {
         self.image = image
+        self.imageDescription = description
+        self.imageTitle = title
     }
 
     /// Initializes a new Image Source with an image name from the main bundle
