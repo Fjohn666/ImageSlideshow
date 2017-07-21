@@ -131,7 +131,7 @@ open class ImageSlideshowItem: UIScrollView, UIScrollViewDelegate {
         self.activityIndicator?.view.center = imageView.center
         
         if let gradientLayer = imageView.layer.sublayers?.first {
-      //   gradientLayer.frame = imageView.bounds
+         gradientLayer.frame = imageView.bounds
         }
         
         var descriptionFrame = imageView.frame
