@@ -49,14 +49,21 @@ class ViewController: UIViewController {
 
         // try out other sources such as `afNetworkingSource`, `alamofireSource` or `sdWebImageSource` or `kingfisherSource`
         slideshow.setImageInputs(alamofireSource)
-
-        let recognizer = UITapGestureRecognizer(target: self, action: #selector(ViewController.didTap))
-        slideshow.addGestureRecognizer(recognizer)
+        
+        //let recognizer = UITapGestureRecognizer(target: self, action: #selector(ViewController.didTap))
+        //slideshow.addGestureRecognizer(recognizer)
+        slideshow.imageDelegate = self
     }
 
     func didTap() {
         let fullScreenController = slideshow.presentFullScreenController(from: self)
         // set the activity indicator for full screen controller; skip the line if no activity indicator should be shown
         fullScreenController.slideshow.activityIndicator = DefaultActivityIndicator(style: .white, color: nil)
+    }
+}
+
+extension ViewController:ImageSlideshowItemProtocol {
+    func didTapOnImage(source: InputSource, at index: Int) {
+        print("image taped at index : \(index)")
     }
 }

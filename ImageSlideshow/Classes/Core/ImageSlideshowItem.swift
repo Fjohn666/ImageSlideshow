@@ -7,12 +7,18 @@
 
 import UIKit
 
+public protocol ImageSlideshowItemProtocol {
+    func didTapOnImage(source:InputSource, at index:Int)
+}
+
 /// Used to wrap a single slideshow item and allow zooming on it
 open class ImageSlideshowItem: UIScrollView, UIScrollViewDelegate {
 
     /// Image view to hold the image
     open let imageView = UIImageView()
 
+    open var tapDelegate:ImageSlideshowItemProtocol?
+    
     /// Label that display the title
     open let titleLabel = UILabel()
 
@@ -41,7 +47,7 @@ open class ImageSlideshowItem: UIScrollView, UIScrollViewDelegate {
     fileprivate var singleTapGestureRecognizer: UITapGestureRecognizer?
     fileprivate var loadFailed = false {
         didSet {
-            singleTapGestureRecognizer?.isEnabled = loadFailed
+            //singleTapGestureRecognizer?.isEnabled = loadFailed
             gestureRecognizer?.isEnabled = !loadFailed
         }
     }
@@ -102,9 +108,9 @@ open class ImageSlideshowItem: UIScrollView, UIScrollViewDelegate {
         imageView.addGestureRecognizer(tapRecognizer)
         gestureRecognizer = tapRecognizer
 
-        singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(retryLoadImage))
+        singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapOnImage))
         singleTapGestureRecognizer!.numberOfTapsRequired = 1
-        singleTapGestureRecognizer!.isEnabled = false
+        singleTapGestureRecognizer!.isEnabled = true
         imageView.addGestureRecognizer(singleTapGestureRecognizer!)
     }
 
@@ -203,6 +209,10 @@ open class ImageSlideshowItem: UIScrollView, UIScrollViewDelegate {
         self.imageView.image = nil
     }
 
+    func didTapOnImage() {
+        self.tapDelegate?.didTapOnImage(source: self.image,at: self.tag)
+    }
+    
     func retryLoadImage() {
         self.loadImage()
     }

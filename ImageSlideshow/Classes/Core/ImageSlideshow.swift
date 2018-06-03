@@ -41,12 +41,18 @@ public enum ImagePreload {
     case all
 }
 
+public protocol ImageSlideshowDelegate {
+   func didTapOnImage(source:InputSource, at index:Int)
+}
+
 /// Main view containing the Image Slideshow
 open class ImageSlideshow: UIView {
 
     /// Scroll View to wrap the slideshow
     open let scrollView = UIScrollView()
 
+    open var imageDelegate:ImageSlideshowDelegate?
+    
     /// Page Control shown in the slideshow
     open let pageControl = UIPageControl()
 
@@ -256,6 +262,8 @@ open class ImageSlideshow: UIView {
         for image in scrollViewImages {
             let item = ImageSlideshowItem(image: image, zoomEnabled: self.zoomEnabled, activityIndicator: self.activityIndicator?.create(),titleFont:titleFont,descriptionFont:descriptionFont,gradient:gradient)
             item.imageView.contentMode = self.contentScaleMode
+            item.tapDelegate = self
+            item.tag = i
             slideshowItems.append(item)
             scrollView.addSubview(item)
             i += 1
@@ -440,6 +448,12 @@ open class ImageSlideshow: UIView {
 
     @objc private func pageControlValueChanged() {
         self.setCurrentPage(pageControl.currentPage, animated: true)
+    }
+}
+
+extension ImageSlideshow: ImageSlideshowItemProtocol {
+    public func didTapOnImage(source: InputSource, at index:Int) {
+        imageDelegate?.didTapOnImage(source: source, at: index)
     }
 }
 
