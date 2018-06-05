@@ -243,6 +243,7 @@ open class ImageSlideshow: UIView {
         for (index, view) in self.slideshowItems.enumerated() {
             if !view.zoomInInitially {
                 view.zoomOut()
+                view.tag = index
             }
             view.frame = CGRect(x: scrollView.frame.size.width * CGFloat(index), y: 0, width: scrollView.frame.size.width, height: scrollView.frame.size.height)
         }
@@ -263,7 +264,7 @@ open class ImageSlideshow: UIView {
             let item = ImageSlideshowItem(image: image, zoomEnabled: self.zoomEnabled, activityIndicator: self.activityIndicator?.create(),titleFont:titleFont,descriptionFont:descriptionFont,gradient:gradient)
             item.imageView.contentMode = self.contentScaleMode
             item.tapDelegate = self
-            item.tag = i
+          
             slideshowItems.append(item)
             scrollView.addSubview(item)
             i += 1
